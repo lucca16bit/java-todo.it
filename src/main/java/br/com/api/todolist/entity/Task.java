@@ -23,7 +23,10 @@ public class Task {
 
     private String description;
 
+    @Column(name = "start_at")
     private LocalDateTime startAt;
+
+    @Column(name = "end_at")
     private LocalDateTime endAt;
 
     @Enumerated(EnumType.STRING)
