@@ -1,5 +1,5 @@
 CREATE TABLE tb_tasks (
-    id CHAR(36) PRIMARY KEY,
+    id BINARY(16) PRIMARY KEY,
     title VARCHAR(50) NOT NULL,
     description TEXT,
     start_at TIMESTAMP,

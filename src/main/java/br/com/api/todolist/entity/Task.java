@@ -1,9 +1,9 @@
 package br.com.api.todolist.entity;
 
+import br.com.api.todolist.dto.tasks.CreateTaskDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.hibernate.annotations.GenericGenerator;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -14,8 +14,6 @@ import java.util.UUID;
 public class Task {
     @Id
     @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @Column(length = 36, updatable = false, nullable = false)
     private UUID id;
 
     @Column(length = 50, nullable = false)
@@ -31,6 +29,14 @@ public class Task {
 
     @Enumerated(EnumType.STRING)
     private Priority priority;
+
+    public Task(CreateTaskDTO dados) {
+        this.title = dados.title();
+        this.description = dados.description();
+        this.startAt = dados.startAt();
+        this.endAt = dados.endAt();
+        this.priority = dados.priority();
+    }
 
     public void setTitle(String title) throws Exception{
         if (title.length() > 50) {
