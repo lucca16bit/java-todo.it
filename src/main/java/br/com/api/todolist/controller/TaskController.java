@@ -23,10 +23,14 @@ public class TaskController {
     @Autowired
     private TaskRepository repository;
 
+    @Autowired
+    private TaskService service;
+
     @PostMapping
     @Transactional
     public ResponseEntity create(@RequestBody CreateTaskDTO dados, UriComponentsBuilder uriBuilder) {
         var task = new Task(dados);
+        service.validate(task);
         repository.save(task);
 
         var uri = uriBuilder.path("/tasks/{id}")
