@@ -63,10 +63,20 @@ public class TaskController {
     @Transactional
     public ResponseEntity update(@PathVariable UUID id, @RequestBody UpdateTaskDTO update) {
         var task = repository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tarefa não encontrada"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tarefa não encontrada"));
         task.updateTask(update);
 
         var taskUpdated = repository.save(task);
         return ResponseEntity.ok().body(new ViewTaskDTO(taskUpdated));
+    }
+
+    @DeleteMapping("/{id}")
+    @Transactional
+    public ResponseEntity delete(@PathVariable UUID id) {
+        var task = repository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tarefa não encontrada"));
+        service.delete(task);
+
+        return ResponseEntity.noContent().build();
     }
 }
