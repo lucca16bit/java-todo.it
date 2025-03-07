@@ -2,6 +2,7 @@ package br.com.api.todolist.controller;
 
 import br.com.api.todolist.dto.tasks.CreateTaskDTO;
 import br.com.api.todolist.dto.tasks.ListTaskDTO;
+import br.com.api.todolist.dto.tasks.UpdateTaskDTO;
 import br.com.api.todolist.dto.tasks.ViewTaskDTO;
 import br.com.api.todolist.entity.Task;
 import br.com.api.todolist.repository.TaskRepository;
@@ -55,6 +56,17 @@ public class TaskController {
     public ResponseEntity view(@PathVariable UUID id) {
         var task = repository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Este ID não existe"));
-        return ResponseEntity.ok(new ViewTaskDTO(task));
+        return ResponseEntity.ok(new ListTaskDTO(task));
+    }
+
+    @PutMapping("/{id}")
+    @Transactional
+    public ResponseEntity update(@PathVariable UUID id, @RequestBody UpdateTaskDTO update) {
+        var task = repository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tarefa não encontrada"));
+        task.updateTask(update);
+
+        var taskUpdated = repository.save(task);
+        return ResponseEntity.ok().body(new ViewTaskDTO(taskUpdated));
     }
 }
