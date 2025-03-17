@@ -33,6 +33,10 @@ public class Task {
     @Enumerated(EnumType.STRING)
     private Priority priority;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
     public Task(CreateTaskDTO dados) {
         this.title = dados.title();
         this.description = dados.description();

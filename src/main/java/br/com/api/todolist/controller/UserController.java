@@ -41,7 +41,7 @@ public class UserController {
         if (repository.findByLogin(createUser.login()) == null) {
             String password = passwordEncoder.encode(createUser.password());
 
-            User userCreated = new User(null, createUser.name(), createUser.login(), password);
+            User userCreated = new User(null, createUser.name(), createUser.login(), password, null);
             repository.save(userCreated);
 
             return ResponseEntity.status(HttpStatus.CREATED).body("Usuário cadastrado");
