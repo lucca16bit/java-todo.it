@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
@@ -44,9 +46,9 @@ public class AuthController {
             User userCreated = new User(null, createUser.name(), createUser.login(), password, null);
             repository.save(userCreated);
 
-            return ResponseEntity.status(HttpStatus.CREATED).body("Usuário cadastrado");
+            return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("message", "Usuário cadastrado"));
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Usuário já existe");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "Usuário já existe"));
         }
     }
 
