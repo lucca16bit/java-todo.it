@@ -23,6 +23,8 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.security.Principal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @RestController
@@ -70,6 +72,43 @@ public class TaskController {
         }
 
         Page<ListTaskDTO> tasks = repository.findByUser(user, pageable)
+                .map(ListTaskDTO::new);
+
+        return ResponseEntity.ok(tasks);
+    }
+
+    @GetMapping("/today")
+    public ResponseEntity<Page<ListTaskDTO>> listTodayTasks(@PageableDefault(size = 10, sort = {"startAt"}, direction = Sort.Direction.ASC) Pageable pageable,
+                                                             Principal principal) {
+        User user = (User) userRepository.findByLogin(principal.getName());
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        LocalDate today = LocalDate.now();
+        LocalDateTime startOfDay = today.atStartOfDay();
+        LocalDateTime endOfDay = today.atTime(23, 59, 59);
+
+        Page<ListTaskDTO> tasks = repository.findByUserAndStartAtBetween(user, startOfDay, endOfDay, pageable)
+                .map(ListTaskDTO::new);
+
+        return ResponseEntity.ok(tasks);
+    }
+
+    @GetMapping("/tomorrow")
+    public ResponseEntity<Page<ListTaskDTO>> listTomorrowTasks(@PageableDefault(size = 10, sort = {"startAt"}, direction = Sort.Direction.ASC) Pageable pageable,
+            Principal principal) {
+        User user = (User) userRepository.findByLogin(principal.getName());
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        LocalDate tomorrow = LocalDate.now().plusDays(1);
+        LocalDateTime startOfTomorrow = tomorrow.atStartOfDay();
+        LocalDateTime endOfTomorrow = tomorrow.atTime(23, 59, 59);
+
+        Page<ListTaskDTO> tasks = repository.findByUserAndStartAtBetween(
+                        user, startOfTomorrow, endOfTomorrow, pageable)
                 .map(ListTaskDTO::new);
 
         return ResponseEntity.ok(tasks);
