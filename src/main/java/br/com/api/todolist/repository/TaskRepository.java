@@ -14,4 +14,6 @@ public interface TaskRepository extends JpaRepository<Task, UUID> {
     Page<Task> findByUser(User user, Pageable pageable);
 
     Page<Task> findByUserAndStartAtBetween(User user, LocalDateTime start, LocalDateTime end, Pageable pageable);
+
+    Page<Task> findByUserOrderByEndAtDesc(User user, Pageable pageable);
 }

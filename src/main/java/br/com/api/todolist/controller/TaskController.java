@@ -71,7 +71,7 @@ public class TaskController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        Page<ListTaskDTO> tasks = repository.findByUser(user, pageable)
+        Page<ListTaskDTO> tasks = repository.findByUserOrderByEndAtDesc(user, pageable)
                 .map(ListTaskDTO::new);
 
         return ResponseEntity.ok(tasks);
