@@ -5,8 +5,11 @@ import br.com.api.todolist.entity.Task;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 public record ListTaskDTO(
+        UUID id,
+
         String title,
 
         String description,
@@ -22,6 +25,7 @@ public record ListTaskDTO(
 
     public ListTaskDTO(Task task) {
         this(
+                task.getId(),
                 task.getTitle(),
                 task.getDescription(),
                 task.getStartAt(),
