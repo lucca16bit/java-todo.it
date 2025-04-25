@@ -16,7 +16,9 @@ public record CreateTaskDTO(
         @JsonFormat(pattern = "dd/MM/yyyy HH:mm")
         LocalDateTime endAt,
 
-        Priority priority
+        Priority priority,
+
+        Boolean completed
 ) {
 
 }

@@ -33,6 +33,9 @@ public class Task {
     @Enumerated(EnumType.STRING)
     private Priority priority;
 
+    @Column(nullable = false)
+    private Boolean completed = false;
+
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -43,6 +46,7 @@ public class Task {
         this.startAt = dados.startAt();
         this.endAt = dados.endAt();
         this.priority = dados.priority();
+        this.completed = dados.completed();
     }
 
     public void setTitle(String title) throws Exception{
@@ -67,6 +71,9 @@ public class Task {
         }
         if (update.priority() != null) {
             this.priority = update.priority();
+        }
+        if (update.completed() != null) {
+            this.completed = update.completed();
         }
     }
 }

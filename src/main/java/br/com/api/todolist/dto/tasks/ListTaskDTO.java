@@ -20,7 +20,9 @@ public record ListTaskDTO(
         @JsonFormat(pattern = "dd/MM/yyyy HH:mm")
         LocalDateTime endAt,
 
-        Priority priority
+        Priority priority,
+
+        Boolean completed
 ) {
 
     public ListTaskDTO(Task task) {
@@ -30,7 +32,8 @@ public record ListTaskDTO(
                 task.getDescription(),
                 task.getStartAt(),
                 task.getEndAt(),
-                task.getPriority()
+                task.getPriority(),
+                task.getCompleted()
         );
     }
 }
