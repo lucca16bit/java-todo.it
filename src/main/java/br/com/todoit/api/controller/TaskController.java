@@ -10,6 +10,7 @@ import br.com.todoit.api.repository.TaskRepository;
 import br.com.todoit.api.repository.UserRepository;
 import br.com.todoit.api.service.TaskService;
 import br.com.todoit.api.service.TokenService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,6 +30,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/tasks")
+@SecurityRequirement(name = "bearer-key")
 public class TaskController {
 
     @Autowired

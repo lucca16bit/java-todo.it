@@ -6,6 +6,7 @@ import br.com.todoit.api.dto.users.TokenDTO;
 import br.com.todoit.api.entity.User;
 import br.com.todoit.api.repository.UserRepository;
 import br.com.todoit.api.service.TokenService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,6 +24,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
+@SecurityRequirement(name = "bearer-key")
 public class AuthController {
 
     @Autowired
