@@ -1,5 +1,6 @@
 package br.com.todoit.api.entity;
 
+import br.com.todoit.api.dto.user.UpdateUserDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -33,6 +34,18 @@ public class User implements UserDetails {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Task> tasks = new ArrayList<>();
+
+    public void updateUser(UpdateUserDTO data) {
+        if (data.name() != null) {
+            this.name = data.name();
+        }
+        if (data.login() != null) {
+            this.login = data.login();
+        }
+        if (data.password() != null) {
+            this.password = data.password();
+        }
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
