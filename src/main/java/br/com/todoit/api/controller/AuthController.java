@@ -1,8 +1,8 @@
 package br.com.todoit.api.controller;
 
-import br.com.todoit.api.dto.users.CreateUserDTO;
-import br.com.todoit.api.dto.users.LoginUserDTO;
-import br.com.todoit.api.dto.users.TokenDTO;
+import br.com.todoit.api.dto.auth.CreateUserDTO;
+import br.com.todoit.api.dto.auth.LoginUserDTO;
+import br.com.todoit.api.dto.auth.TokenDTO;
 import br.com.todoit.api.entity.User;
 import br.com.todoit.api.repository.UserRepository;
 import br.com.todoit.api.service.TokenService;
@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -41,25 +42,25 @@ public class AuthController {
 
     @PostMapping("/register")
     @Transactional
-    public ResponseEntity register(@RequestBody @Valid CreateUserDTO createUser) {
-        if (repository.findByLogin(createUser.login()) == null) {
-            String password = passwordEncoder.encode(createUser.password());
+    public ResponseEntity<String> register(@RequestBody @Valid CreateUserDTO data) {
+        if (repository.findByLogin(data.login()) == null) {
+            String password = passwordEncoder.encode(data.password());
 
-            User userCreated = new User(null, createUser.name(), createUser.login(), password, null);
+            User userCreated = new User(null, data.name(), data.login(), password, null);
             repository.save(userCreated);
 
-            return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("message", "Usuário cadastrado"));
+            return ResponseEntity.status(HttpStatus.CREATED).body("Usuário cadastrado");
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "Usuário já existe"));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Usuário já existe");
         }
     }
 
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody LoginUserDTO loginUser) {
-        var authenticationToken = new UsernamePasswordAuthenticationToken(loginUser.login(), loginUser.password());
-        var authentication = manager.authenticate(authenticationToken);
+    public ResponseEntity<TokenDTO> login(@RequestBody LoginUserDTO data) {
+        var authenticationToken = new UsernamePasswordAuthenticationToken(data.login(), data.password());
+        Authentication authentication = manager.authenticate(authenticationToken);
 
-        var token = tokenService.generateToken((User) authentication.getPrincipal());
+        String token = tokenService.generateToken((User) authentication.getPrincipal());
 
         return ResponseEntity.ok(new TokenDTO(token));
     }

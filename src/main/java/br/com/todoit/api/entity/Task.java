@@ -40,13 +40,13 @@ public class Task {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    public Task(CreateTaskDTO dados) {
-        this.title = dados.title();
-        this.description = dados.description();
-        this.startAt = dados.startAt();
-        this.endAt = dados.endAt();
-        this.priority = dados.priority();
-        this.completed = dados.completed();
+    public Task(CreateTaskDTO data) {
+        this.title = data.title();
+        this.description = data.description();
+        this.startAt = data.startAt();
+        this.endAt = data.endAt();
+        this.priority = data.priority();
+        this.completed = data.completed();
     }
 
     public void setTitle(String title) throws Exception{
@@ -56,24 +56,24 @@ public class Task {
         this.title = title;
     }
 
-    public void updateTask(UpdateTaskDTO update) {
-        if (update.title() != null) {
-            this.title = update.title();
+    public void updateTask(UpdateTaskDTO data) {
+        if (data.title() != null) {
+            this.title = data.title();
         }
-        if (update.description() != null) {
-            this.description = update.description();
+        if (data.description() != null) {
+            this.description = data.description();
         }
-        if (update.startAt() != null) {
-            this.startAt = update.startAt();
+        if (data.startAt() != null) {
+            this.startAt = data.startAt();
         }
-        if (update.endAt() != null) {
-            this.endAt = update.endAt();
+        if (data.endAt() != null) {
+            this.endAt = data.endAt();
         }
-        if (update.priority() != null) {
-            this.priority = update.priority();
+        if (data.priority() != null) {
+            this.priority = data.priority();
         }
-        if (update.completed() != null) {
-            this.completed = update.completed();
+        if (data.completed() != null) {
+            this.completed = data.completed();
         }
     }
 }

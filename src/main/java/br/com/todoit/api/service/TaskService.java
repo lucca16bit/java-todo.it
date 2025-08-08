@@ -1,11 +1,13 @@
 package br.com.todoit.api.service;
 
+import br.com.todoit.api.dto.services.DateRangeDTO;
 import br.com.todoit.api.entity.Task;
 import br.com.todoit.api.exception.InvalidDateException;
 import br.com.todoit.api.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Service
@@ -23,7 +25,21 @@ public class TaskService {
         }
     }
 
-    public void delete(Task task) {
-        this.repository.delete(task);
+    public DateRangeDTO getTodayDate() {
+        LocalDate today = LocalDate.now();
+
+        return new DateRangeDTO(
+                today.atStartOfDay(),
+                today.atTime(23, 59, 59)
+        );
+    }
+
+    public DateRangeDTO getTomorrowDate() {
+        LocalDate tomorrow = LocalDate.now().plusDays(1);
+
+        return new DateRangeDTO(
+                tomorrow.atStartOfDay(),
+                tomorrow.atTime(23, 59, 59)
+        );
     }
 }

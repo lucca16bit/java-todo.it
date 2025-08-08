@@ -20,7 +20,7 @@ public class TokenService {
         try {
             var algorithm = Algorithm.HMAC256(secret);
             return JWT.create()
-                    .withIssuer("to-do list API")
+                    .withIssuer("todo.it API")
                     .withSubject(user.getLogin())
                     .withExpiresAt(LocalDateTime.now().plusHours(2).toInstant(ZoneOffset.of("-03:00")))
                     .sign(algorithm);
@@ -33,7 +33,7 @@ public class TokenService {
         try {
             var algorithm = Algorithm.HMAC256(secret);
             return JWT.require(algorithm)
-                    .withIssuer("to-do list API")
+                    .withIssuer("todo.it API")
                     .build()
                     .verify(token)
                     .getSubject();

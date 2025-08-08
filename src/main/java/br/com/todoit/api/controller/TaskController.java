@@ -1,5 +1,6 @@
 package br.com.todoit.api.controller;
 
+import br.com.todoit.api.dto.services.DateRangeDTO;
 import br.com.todoit.api.dto.tasks.CreateTaskDTO;
 import br.com.todoit.api.dto.tasks.ListTaskDTO;
 import br.com.todoit.api.dto.tasks.UpdateTaskDTO;
@@ -16,21 +17,25 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.security.Principal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
+
+import static org.springframework.data.web.config.EnableSpringDataWebSupport.PageSerializationMode.VIA_DTO;
 
 @RestController
 @RequestMapping("/tasks")
 @SecurityRequirement(name = "bearer-key")
+@EnableSpringDataWebSupport(pageSerializationMode = VIA_DTO)
 public class TaskController {
 
     @Autowired
@@ -47,13 +52,15 @@ public class TaskController {
 
     @PostMapping
     @Transactional
-    public ResponseEntity create(@RequestBody CreateTaskDTO dados, UriComponentsBuilder uriBuilder, Principal principal) {
-        User user = (User) userRepository.findByLogin(principal.getName());
+    public ResponseEntity<?> create(
+            @RequestBody CreateTaskDTO data, UriComponentsBuilder uriBuilder,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        User user = (User) userRepository.findByLogin(userDetails.getUsername());
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        var task = new Task(dados);
+        var task = new Task(data);
         task.setUser(user);
 
         service.validate(task);
@@ -66,9 +73,10 @@ public class TaskController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<ListTaskDTO>> list(@PageableDefault(size = 10, sort = {"startAt"}, direction = Sort.Direction.ASC) Pageable pageable,
-                                                  Principal principal) {
-        User user = (User) userRepository.findByLogin(principal.getName());
+    public ResponseEntity<Page<ListTaskDTO>> list(
+            @PageableDefault(size = 10, sort = {"startAt"}, direction = Sort.Direction.ASC) Pageable pageable,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        User user = (User) userRepository.findByLogin(userDetails.getUsername());
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -80,16 +88,17 @@ public class TaskController {
     }
 
     @GetMapping("/today")
-    public ResponseEntity<Page<ListTaskDTO>> listTodayTasks(@PageableDefault(size = 10, sort = {"startAt"}, direction = Sort.Direction.ASC) Pageable pageable,
-                                                             Principal principal) {
-        User user = (User) userRepository.findByLogin(principal.getName());
+    public ResponseEntity<Page<ListTaskDTO>> listTodayTasks(
+            @PageableDefault(size = 10, sort = {"startAt"}, direction = Sort.Direction.ASC) Pageable pageable,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        User user = (User) userRepository.findByLogin(userDetails.getUsername());
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        LocalDate today = LocalDate.now();
-        LocalDateTime startOfDay = today.atStartOfDay();
-        LocalDateTime endOfDay = today.atTime(23, 59, 59);
+        DateRangeDTO todayRange = service.getTodayDate();
+        LocalDateTime startOfDay = todayRange.start();
+        LocalDateTime endOfDay = todayRange.end();
 
         Page<ListTaskDTO> tasks = repository.findByUserAndStartAtBetween(user, startOfDay, endOfDay, pageable)
                 .map(ListTaskDTO::new);
@@ -98,27 +107,27 @@ public class TaskController {
     }
 
     @GetMapping("/tomorrow")
-    public ResponseEntity<Page<ListTaskDTO>> listTomorrowTasks(@PageableDefault(size = 10, sort = {"startAt"}, direction = Sort.Direction.ASC) Pageable pageable,
-            Principal principal) {
-        User user = (User) userRepository.findByLogin(principal.getName());
+    public ResponseEntity<Page<ListTaskDTO>> listTomorrowTasks(
+            @PageableDefault(size = 10, sort = {"startAt"}, direction = Sort.Direction.ASC) Pageable pageable,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        User user = (User) userRepository.findByLogin(userDetails.getUsername());
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        LocalDate tomorrow = LocalDate.now().plusDays(1);
-        LocalDateTime startOfTomorrow = tomorrow.atStartOfDay();
-        LocalDateTime endOfTomorrow = tomorrow.atTime(23, 59, 59);
+        DateRangeDTO tomorrow = service.getTomorrowDate();
+        LocalDateTime startOfTomorrow = tomorrow.start();
+        LocalDateTime endOfTomorrow = tomorrow.end();
 
-        Page<ListTaskDTO> tasks = repository.findByUserAndStartAtBetween(
-                        user, startOfTomorrow, endOfTomorrow, pageable)
+        Page<ListTaskDTO> tasks = repository.findByUserAndStartAtBetween(user, startOfTomorrow, endOfTomorrow, pageable)
                 .map(ListTaskDTO::new);
 
         return ResponseEntity.ok(tasks);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity view(@PathVariable UUID id, Principal principal) {
-        User user = (User) userRepository.findByLogin(principal.getName());
+    public ResponseEntity<?> view(@PathVariable UUID id, @AuthenticationPrincipal UserDetails userDetails) {
+        User user = (User) userRepository.findByLogin(userDetails.getUsername());
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -135,8 +144,8 @@ public class TaskController {
 
     @PutMapping("/{id}")
     @Transactional
-    public ResponseEntity update(@PathVariable UUID id, @RequestBody UpdateTaskDTO update, Principal principal) {
-        User user = (User) userRepository.findByLogin(principal.getName());
+    public ResponseEntity<?> update(@PathVariable UUID id, @RequestBody UpdateTaskDTO data, @AuthenticationPrincipal UserDetails userDetails) {
+        User user = (User) userRepository.findByLogin(userDetails.getUsername());
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -147,8 +156,7 @@ public class TaskController {
         if (!task.getUser().equals(user)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Você não tem permissão para editar essa tarefa");
         }
-        task.updateTask(update);
-
+        task.updateTask(data);
 
         var taskUpdated = repository.save(task);
         return ResponseEntity.ok().body(new ViewTaskDTO(taskUpdated));
@@ -156,8 +164,8 @@ public class TaskController {
 
     @DeleteMapping("/{id}")
     @Transactional
-    public ResponseEntity delete(@PathVariable UUID id, Principal principal) {
-        User user = (User) userRepository.findByLogin(principal.getName());
+    public ResponseEntity<?> delete(@PathVariable UUID id, @AuthenticationPrincipal UserDetails userDetails) {
+        User user = (User) userRepository.findByLogin(userDetails.getUsername());
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -169,7 +177,7 @@ public class TaskController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Você não tem permissão para editar essa tarefa");
         }
 
-        service.delete(task);
+        repository.delete(task);
 
         return ResponseEntity.noContent().build();
     }

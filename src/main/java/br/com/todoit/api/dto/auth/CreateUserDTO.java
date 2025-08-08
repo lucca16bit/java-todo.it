@@ -1,4 +1,4 @@
-package br.com.todoit.api.dto.users;
+package br.com.todoit.api.dto.auth;
 
 import jakarta.validation.constraints.NotBlank;
 
