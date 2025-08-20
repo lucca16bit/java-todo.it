@@ -1,5 +1,5 @@
 CREATE TABLE tb_users (
-    id BINARY(16) PRIMARY KEY,
+    id UUID PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     login VARCHAR(50) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL

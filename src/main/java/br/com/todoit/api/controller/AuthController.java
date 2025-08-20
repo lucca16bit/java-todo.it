@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -42,16 +43,20 @@ public class AuthController {
 
     @PostMapping("/register")
     @Transactional
-    public ResponseEntity<String> register(@RequestBody @Valid CreateUserDTO data) {
+    public ResponseEntity<Map<String, String>> register(@RequestBody @Valid CreateUserDTO data) {
+        Map<String, String> response = new HashMap<>();
+
         if (repository.findByLogin(data.login()) == null) {
             String password = passwordEncoder.encode(data.password());
 
             User userCreated = new User(null, data.name(), data.login(), password, null);
             repository.save(userCreated);
 
-            return ResponseEntity.status(HttpStatus.CREATED).body("Usuário cadastrado");
+            response.put("message", "Usuário cadastrado");
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Usuário já existe");
+            response.put("message", "Usuário já existe");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
 

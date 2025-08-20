@@ -1,5 +1,5 @@
 CREATE TABLE tb_tasks (
-    id BINARY(16) PRIMARY KEY,
+    id UUID PRIMARY KEY,
     title VARCHAR(50) NOT NULL,
     description TEXT,
     start_at TIMESTAMP,
